@@ -14,17 +14,27 @@ export const update = async (req, res, next) => {
 
   try {
     if (req.userId !== req.params.id) {
-      return next(handleError(StatusCodes.FORBIDDEN, "You are not authorized to perform this action"));
-    };
+      return next(
+        handleError(
+          StatusCodes.FORBIDDEN,
+          "You are not authorized to perform this action"
+        )
+      );
+    }
 
     if (!name || !email || !password) {
-      return next(handleError(StatusCodes.BAD_REQUEST, "Name, email, and password are required"));
+      return next(
+        handleError(
+          StatusCodes.BAD_REQUEST,
+          "Name, email, and password are required"
+        )
+      );
     }
 
     let updatedData = {
       name,
       email,
-      password
+      password,
     };
     if (image) {
       const result = await cloudinary.uploader
@@ -33,11 +43,14 @@ export const update = async (req, res, next) => {
           folder: "mern-estate",
         })
         .catch((error) => {
-          return next(handleError(StatusCodes.INTERNAL_SERVER_ERROR, error.message));
+          return next(
+            handleError(StatusCodes.INTERNAL_SERVER_ERROR, error.message)
+          );
         });
-        updatedData = { ...updatedData,
-          avatar: result?.secure_url, // Save the image URL
-        };
+      updatedData = {
+        ...updatedData,
+        avatar: result?.secure_url, // Save the image URL
+      };
     }
 
     // Update the user in the database
@@ -49,4 +62,27 @@ export const update = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+export const deleteUser = async (req, res, next) => {
+  try {
+    if (req.userId !== req.params.id) {
+      return next(
+        handleError(
+          StatusCodes.FORBIDDEN,
+          "You are not authorized to perform this action"
+        )
+      );
+    }
+
+    const user = await User.findByIdAndDelete(req.params.id);
+    
+    res.status(StatusCodes.OK).json({ message: "User deleted successfully" }).clearCookie("access_token");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const signOut = (req, res) => {
+  res.clearCookie("access_token").status(StatusCodes.OK).json({ message: "Sign out successfully!" });
 };
