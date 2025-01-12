@@ -8,7 +8,7 @@ import { createListing,
 
 const router = express.Router();
 
-router.post('/',verifyToken, createListing);
+router.post('/', verifyToken, createListing);
 // router.get('/', getListings);
 // router.get('/:id', getListing);
 // router.put('/:id',verifyToken, updateListing);
