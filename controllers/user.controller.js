@@ -3,6 +3,7 @@ import bcryptjs from "bcryptjs";
 import { handleError } from "../utils/error.js";
 import { v2 as cloudinary } from "cloudinary";
 import { StatusCodes } from "http-status-codes";
+import Listing from "../models/listing.model.js";
 
 export const test = (req, res) => {
   res.status(200).json({ message: "User route works" });
@@ -85,4 +86,17 @@ export const deleteUser = async (req, res, next) => {
 
 export const signOut = (req, res) => {
   res.clearCookie("access_token").status(StatusCodes.OK).json({ message: "Sign out successfully!" });
+};
+
+export const getUserListings = async (req, res, next) => {
+  if (req.userId === req.params.id) {
+    try {
+      const listings = await Listing.find({ userRef: req.params.id });
+      res.status(200).json(listings);
+    } catch (error) {
+      next(error);
+    }
+  } else {
+    return next(errorHandler(401, 'You can only view your own listings!'));
+  }
 };
