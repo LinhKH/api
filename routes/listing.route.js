@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.post('/', verifyToken, createListing);
 router.delete('/:id', verifyToken, deleteListing);
-router.put('/:id', verifyToken, updateListing);
+router.put('/update/:id', verifyToken, updateListing);
 router.get('/get/:id', getListing);
 router.get('/get', getListings);
 
